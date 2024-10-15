@@ -6,9 +6,19 @@ on:
       - main
   pull_request:
     types: [opened, synchronize, reopened]
+
 jobs:
+  check-paths:
+    uses: ./.github/workflows/path-checker.yml
+    with:
+      base_ref: ${{ github.event.pull_request.base.sha }}
+      head_ref: ${{ github.event.pull_request.head.sha }}
+      paths: 'app/ui/'
+
   build:
     name: Build and analyze
+    needs: [check-paths]
+    if: ${{ needs.check-paths.outputs.changes_detected == 'true' }}
     runs-on: ubuntu-latest
     container:
       image: ghcr.io/cirruslabs/flutter:stable

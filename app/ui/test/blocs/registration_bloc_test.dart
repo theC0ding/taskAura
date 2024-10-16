@@ -28,6 +28,23 @@ void main() {
       ],
     );
 
+    // Test for failed registration due to invalid email
+    blocTest<RegistrationBloc, RegistrationState>(
+      'emits [RegistrationLoading, RegistrationFailure] when email is invalid',
+      build: () => RegistrationBloc(),
+      act: (bloc) => bloc.add(RegistrationButtonPressed(
+        email: 'invalidEmail',
+        password: 'Password12\$',
+        confirmPassword: 'Password12\$',
+      )),
+      wait: const Duration(seconds: 2), // Wait for the simulated delay
+      expect: () => [
+        RegistrationLoading(), // State after loading starts
+        const RegistrationFailure(
+            'Please enter a valid email address'), // Failure state when email is invalid
+      ],
+    );
+
     // Test for failed registration due to mismatched passwords
     blocTest<RegistrationBloc, RegistrationState>(
       'emits [RegistrationLoading, RegistrationFailure] when passwords do not match',

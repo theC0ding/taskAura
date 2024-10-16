@@ -10,7 +10,7 @@ Widget makeTestableWidget({required Widget child}) {
 }
 
 void main() {
-  group("CustomTextFieldWidget", () {
+  group('CustomTextFieldWidget', () {
     // Rendering Tests
     testWidgets("renders with mandatory parameters (labelText)",
         (WidgetTester tester) async {
@@ -60,40 +60,52 @@ void main() {
     });
 
     // Interaction Tests
-    testWidgets("renders with obscure text (password)",
+    testWidgets("renders with obscure text (password) initially set by parent",
         (WidgetTester tester) async {
       await tester.pumpWidget(makeTestableWidget(
         child: const CustomTextFieldWidget(
           labelText: 'Password',
-          obscureText: true,
+          obscureText: true, // Initially obscured
         ),
       ));
 
       final textField = tester.widget<TextField>(find.byType(TextField));
-      expect(textField.obscureText, isTrue); // TextField is obscured
+      expect(textField.obscureText, isTrue); // TextField is initially obscured
     });
 
-    testWidgets("toggles obscure text when suffix icon is pressed",
+    testWidgets("shows text when obscureText is false",
         (WidgetTester tester) async {
       await tester.pumpWidget(makeTestableWidget(
         child: const CustomTextFieldWidget(
           labelText: 'Password',
-          obscureText: true,
-          suffixIcon: Icons.visibility_off,
+          obscureText: false, // Not obscured
         ),
       ));
 
-      // Verify that the password field starts as obscured
-      expect(
-          tester.widget<TextField>(find.byType(TextField)).obscureText, isTrue);
+      final textField = tester.widget<TextField>(find.byType(TextField));
+      expect(textField.obscureText, isFalse); // TextField is not obscured
+    });
 
-      // Tap the visibility icon
-      await tester.tap(find.byIcon(Icons.visibility_off));
+    testWidgets("calls onSuffixIconTap when suffix icon is pressed",
+        (WidgetTester tester) async {
+      bool wasTapped = false;
+
+      await tester.pumpWidget(makeTestableWidget(
+        child: CustomTextFieldWidget(
+          labelText: 'Password',
+          obscureText: false, // Initially obscured
+          suffixIcon: Icons.visibility,
+          onSuffixIconTap: () {
+            wasTapped = true;
+          },
+        ),
+      ));
+
+      await tester
+          .tap(find.byIcon(Icons.visibility)); // Tap the visibility icon
       await tester.pumpAndSettle();
 
-      // Verify that the password field is now visible
-      expect(tester.widget<TextField>(find.byType(TextField)).obscureText,
-          isFalse);
+      expect(wasTapped, isTrue); // Ensure the tap callback was triggered
     });
 
     testWidgets("accepts text input", (WidgetTester tester) async {
@@ -147,31 +159,6 @@ void main() {
 
       expect(find.text('Please enter a valid email'),
           findsOneWidget); // Helper text is rendered
-    });
-
-    // Test for obscured confirm password field toggle
-    testWidgets(
-        "toggles confirm password obscure text when suffix icon is pressed",
-        (WidgetTester tester) async {
-      await tester.pumpWidget(makeTestableWidget(
-        child: const CustomTextFieldWidget(
-          labelText: 'Confirm Password',
-          obscureText: true,
-          suffixIcon: Icons.visibility_off,
-        ),
-      ));
-
-      // Verify that the confirm password field starts as obscured
-      expect(
-          tester.widget<TextField>(find.byType(TextField)).obscureText, isTrue);
-
-      // Tap the visibility icon
-      await tester.tap(find.byIcon(Icons.visibility_off));
-      await tester.pumpAndSettle();
-
-      // Verify that the confirm password field is now visible
-      expect(tester.widget<TextField>(find.byType(TextField)).obscureText,
-          isFalse);
     });
   });
 }

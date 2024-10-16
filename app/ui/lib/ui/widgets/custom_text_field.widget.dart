@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
-class CustomTextFieldWidget extends StatefulWidget {
+class CustomTextFieldWidget extends StatelessWidget {
   const CustomTextFieldWidget({
     super.key,
     required this.labelText,
@@ -9,7 +9,7 @@ class CustomTextFieldWidget extends StatefulWidget {
     this.controller,
     this.prefixIcon,
     this.suffixIcon,
-    this.obscureText = false,
+    this.obscureText = false, // Parent controls the obscureText state
     this.errorText,
     this.keyboardType,
     this.textInputAction,
@@ -30,7 +30,7 @@ class CustomTextFieldWidget extends StatefulWidget {
   final TextEditingController? controller;
   final IconData? prefixIcon;
   final IconData? suffixIcon;
-  final bool obscureText;
+  final bool obscureText; // Parent manages this now
   final String? errorText;
   final TextInputType? keyboardType;
   final TextInputAction? textInputAction;
@@ -40,78 +40,54 @@ class CustomTextFieldWidget extends StatefulWidget {
   final TextStyle? textStyle;
   final List<TextInputFormatter>? inputFormatters;
   final void Function(String)? onFieldSubmitted;
-  final VoidCallback?
-      onSuffixIconTap; // New callback for suffix icon tap action
-  final bool enabled; // New flag to control whether the field is enabled or not
+  final VoidCallback? onSuffixIconTap; // Custom action for suffix icon
+  final bool enabled; // Flag to control whether the field is enabled
   final TextStyle? errorStyle; // New field for custom error text style
   final TextStyle? helperStyle; // New field for custom helper text style
 
   @override
-  _CustomTextFieldWidgetState createState() => _CustomTextFieldWidgetState();
-}
-
-class _CustomTextFieldWidgetState extends State<CustomTextFieldWidget> {
-  bool _isObscure = false;
-
-  @override
-  void initState() {
-    super.initState();
-    _isObscure = widget.obscureText;
-  }
-
-  void _toggleObscureText() {
-    setState(() {
-      _isObscure = !_isObscure;
-    });
-  }
-
-  @override
   Widget build(BuildContext context) {
     return TextFormField(
-      controller: widget.controller,
-      obscureText: _isObscure,
-      focusNode: widget.focusNode,
-      keyboardType: widget.keyboardType,
-      textInputAction: widget.textInputAction,
-      autovalidateMode: widget.autovalidateMode,
-      onFieldSubmitted: widget.onFieldSubmitted,
-      inputFormatters: widget.inputFormatters,
-      enabled: widget.enabled, // Control whether the field is enabled
-      style: widget.textStyle ??
+      controller: controller,
+      obscureText: obscureText, // Use the parent's obscureText state
+      focusNode: focusNode,
+      keyboardType: keyboardType,
+      textInputAction: textInputAction,
+      autovalidateMode: autovalidateMode,
+      onFieldSubmitted: onFieldSubmitted,
+      inputFormatters: inputFormatters,
+      enabled: enabled,
+      style: textStyle ??
           TextStyle(color: Theme.of(context).colorScheme.onSurface),
       decoration: _buildInputDecoration(context),
       cursorColor: Theme.of(context).colorScheme.primary,
     );
   }
 
-  /// Builds the input decoration with label, hint, prefix/suffix icons, etc.
   InputDecoration _buildInputDecoration(BuildContext context) {
     return InputDecoration(
-      labelText: widget.labelText,
+      labelText: labelText,
       labelStyle: TextStyle(color: Theme.of(context).colorScheme.primary),
-      hintText: widget.hintText,
+      hintText: hintText,
       hintStyle:
           TextStyle(color: Theme.of(context).colorScheme.onSurfaceVariant),
       enabledBorder: _buildInputBorder(Theme.of(context).colorScheme.outline),
       focusedBorder: _buildInputBorder(Theme.of(context).colorScheme.primary),
       errorBorder: _buildInputBorder(Theme.of(context).colorScheme.error),
-      disabledBorder: _buildInputBorder(Theme.of(context)
-          .colorScheme
-          .onSurface
-          .withOpacity(0.5)), // Disabled border
+      disabledBorder: _buildInputBorder(
+          Theme.of(context).colorScheme.onSurface.withOpacity(0.5)),
       fillColor: Theme.of(context).colorScheme.surface,
       filled: true,
       prefixIcon: _buildPrefixIcon(context),
       suffixIcon: _buildSuffixIcon(context),
-      errorText: widget.errorText,
-      errorStyle: widget.errorStyle, // Apply custom error style
-      helperText: widget.helperText,
-      helperStyle: widget.helperStyle, // Apply custom helper text style
+      errorText: errorText,
+      errorStyle: errorStyle,
+      helperText: helperText,
+      helperStyle: helperStyle,
       contentPadding: const EdgeInsets.symmetric(vertical: 16, horizontal: 12),
     );
   }
 
-  /// Builds the border for the text field depending on the state (enabled, focused, error)
   OutlineInputBorder _buildInputBorder(Color borderColor) {
     return OutlineInputBorder(
       borderRadius: BorderRadius.circular(18),
@@ -119,30 +95,17 @@ class _CustomTextFieldWidgetState extends State<CustomTextFieldWidget> {
     );
   }
 
-  /// Builds the prefix icon, if provided
   Widget? _buildPrefixIcon(BuildContext context) {
-    if (widget.prefixIcon == null) return null;
-    return Icon(widget.prefixIcon,
-        color: Theme.of(context).colorScheme.primary);
+    if (prefixIcon == null) return null;
+    return Icon(prefixIcon, color: Theme.of(context).colorScheme.primary);
   }
 
-  /// Builds the suffix icon, with handling for the password visibility toggle or custom action
   Widget? _buildSuffixIcon(BuildContext context) {
-    if (widget.obscureText) {
-      return IconButton(
-        icon: Icon(_isObscure ? Icons.visibility : Icons.visibility_off,
-            color: Theme.of(context).colorScheme.primary),
-        onPressed: widget.onSuffixIconTap ??
-            _toggleObscureText, // Custom tap action or default toggle
-      );
-    } else if (widget.suffixIcon != null) {
-      return IconButton(
-        icon: Icon(widget.suffixIcon,
-            color: Theme.of(context).colorScheme.primary),
-        onPressed:
-            widget.onSuffixIconTap, // Custom action when tapping suffix icon
-      );
-    }
-    return null;
+    if (suffixIcon == null) return null;
+    return IconButton(
+      icon: Icon(obscureText ? Icons.visibility_off : Icons.visibility,
+          color: Theme.of(context).colorScheme.primary),
+      onPressed: onSuffixIconTap, // Action passed from parent
+    );
   }
 }

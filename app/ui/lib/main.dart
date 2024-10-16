@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:ui/theme.dart';
 import 'package:ui/ui/screens/registration.screen.dart';
 
 void main() {
@@ -13,10 +14,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
         title: 'Flutter Demo',
-        theme: ThemeData(
-          colorScheme: ColorScheme.fromSeed(seedColor: Colors.white),
-          useMaterial3: true,
-        ),
-        home: const RegistrationScreen());
+        theme: MaterialTheme(TextTheme()).light(),
+        home: RegistrationScreen());
   }
 }

@@ -1,21 +1,76 @@
 import 'package:equatable/equatable.dart';
 
 abstract class RegistrationState extends Equatable {
-  @override
-  List<Object> get props => [];
+  const RegistrationState();
+
+  R when<R>({
+    required R Function() onInitial,
+    required R Function() onLoading,
+    required R Function() onSuccess,
+    required R Function(String message) onFailure,
+  });
 }
 
-class RegistrationInitial extends RegistrationState {}
+class RegistrationInitial extends RegistrationState {
+  @override
+  R when<R>({
+    required R Function() onInitial,
+    required R Function() onLoading,
+    required R Function() onSuccess,
+    required R Function(String message) onFailure,
+  }) {
+    return onInitial();
+  }
 
-class RegistrationLoading extends RegistrationState {}
+  @override
+  List<Object?> get props => [];
+}
 
-class RegistrationSuccess extends RegistrationState {}
+class RegistrationLoading extends RegistrationState {
+  @override
+  R when<R>({
+    required R Function() onInitial,
+    required R Function() onLoading,
+    required R Function() onSuccess,
+    required R Function(String message) onFailure,
+  }) {
+    return onLoading();
+  }
+
+  @override
+  List<Object?> get props => [];
+}
+
+class RegistrationSuccess extends RegistrationState {
+  @override
+  R when<R>({
+    required R Function() onInitial,
+    required R Function() onLoading,
+    required R Function() onSuccess,
+    required R Function(String message) onFailure,
+  }) {
+    return onSuccess();
+  }
+
+  @override
+  List<Object?> get props => [];
+}
 
 class RegistrationFailure extends RegistrationState {
   final String message;
 
-  RegistrationFailure({required this.message});
+  const RegistrationFailure(this.message);
 
   @override
-  List<Object> get props => [message];
+  R when<R>({
+    required R Function() onInitial,
+    required R Function() onLoading,
+    required R Function() onSuccess,
+    required R Function(String message) onFailure,
+  }) {
+    return onFailure(message);
+  }
+
+  @override
+  List<Object?> get props => [message];
 }

@@ -40,7 +40,7 @@ class RegistrationBloc extends Bloc<RegistrationEvent, RegistrationState> {
     }
 
     // Simulate async operation (e.g., API call)
-    await Future.delayed(const Duration(seconds: 2));
+    await Future.delayed(const Duration(seconds: 1));
 
     // If all validation passes
     emit(RegistrationSuccess());

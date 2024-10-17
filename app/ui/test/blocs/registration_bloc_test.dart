@@ -41,7 +41,7 @@ void main() {
       expect: () => [
         RegistrationLoading(), // State after loading starts
         const RegistrationFailure(
-            'Please enter a valid email address'), // Failure state when email is invalid
+            'Please enter a valid email'), // Failure state when email is invalid
       ],
     );
 

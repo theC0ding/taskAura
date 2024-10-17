@@ -24,7 +24,7 @@ class PasswordValidator {
     }
 
     // Contains at least one special character
-    if (!RegExp(r'^(?=.*?[!@#\$&*~])').hasMatch(value)) {
+    if (!RegExp(r'^(?=.*?[!@#$&*~])').hasMatch(value)) {
       return 'Password must contain at least one special character';
     }
 
